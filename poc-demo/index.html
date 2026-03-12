@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MASTG-TEST0016 – Weak Session Token PoC</title>
+    <meta name="description" content="Interactive proof-of-concept demonstrating weak session token generation vulnerability in MASTG-TEST0016 Android app using java.util.Random">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ─── Top Control Bar ─── -->
+    <header id="control-bar">
+        <div class="control-left">
+            <div class="logo-mark">🛡️</div>
+            <h1>MASTG-TEST0016 Vulnerability Demo</h1>
+        </div>
+        <div class="control-right">
+            <button id="btn-reset" class="ctrl-btn" title="Reset everything">↻ Reset</button>
+            <span class="separator"></span>
+            <span class="badge">CVE: Weak Randomness</span>
+        </div>
+    </header>
+
+    <main id="app">
+        <!-- ─── Left: Android Simulator ─── -->
+        <section id="phone-panel">
+            <h2 class="panel-title">📱 Android App Simulation</h2>
+            <p class="panel-subtitle">Faithful replica of <code>com.example.mastg_test0016</code></p>
+
+            <div id="phone-frame">
+                <div id="phone-notch"></div>
+                <div id="phone-status-bar">
+                    <span class="status-time" id="status-time">20:15</span>
+                    <span class="status-icons">
+                        <span>📶</span><span>🔋</span>
+                    </span>
+                </div>
+
+                <!-- Screen: MainActivity (Register / Login) -->
+                <div id="screen-main" class="phone-screen active">
+                    <div class="android-toolbar">MASTG-TEST0016</div>
+                    <div class="screen-body">
+                        <h3 class="screen-title">MASTG-TEST-0016</h3>
+                        <p class="screen-subtitle">Testing Random Number Generation</p>
+                        <p class="screen-desc">This test case focuses on showing an insecure mechanism of Login session through the Java.Util.Random Library</p>
+                        <div class="form-group">
+                            <input type="text" id="reg-username" class="android-input" placeholder="Username" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" id="reg-password" class="android-input" placeholder="Password" autocomplete="off">
+                        </div>
+                        <button id="btn-register" class="android-btn">REGISTER</button>
+                        <button id="btn-go-login" class="android-btn secondary">LOGIN</button>
+                    </div>
+                </div>
+
+                <!-- Screen: Login -->
+                <div id="screen-login" class="phone-screen">
+                    <div class="android-toolbar">
+                        <span class="toolbar-back" id="login-back">←</span>
+                        MASTG-TEST0016
+                    </div>
+                    <div class="screen-body">
+                        <h3 class="screen-title">Login</h3>
+                        <div class="form-group">
+                            <input type="text" id="login-username" class="android-input" placeholder="Username" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" id="login-password" class="android-input" placeholder="Password" autocomplete="off">
+                        </div>
+                        <button id="btn-login" class="android-btn">LOGIN</button>
+                    </div>
+                </div>
+
+                <!-- Screen: Profile -->
+                <div id="screen-profile" class="phone-screen">
+                    <div class="android-toolbar">MASTG-TEST0016</div>
+                    <div class="screen-body">
+                        <h3 class="screen-title">Profile</h3>
+                        <div id="profile-webview" class="webview-sim">
+                            <p>Welcome, <strong id="profile-user">user</strong>!</p>
+                            <p class="wv-note">WebView content area</p>
+                        </div>
+                        <div class="session-display">
+                            <span class="label">Session Token</span>
+                            <code id="session-token-display">—</code>
+                        </div>
+                        <button id="btn-logout" class="android-btn danger">LOG OUT</button>
+                    </div>
+                </div>
+
+                <div id="phone-nav-bar">
+                    <span>◁</span><span>○</span><span>□</span>
+                </div>
+            </div>
+            <div id="toast-container"></div>
+        </section>
+
+        <!-- ─── Right: Attack Panel ─── -->
+        <section id="attack-panel">
+            <h2 class="panel-title">🔓 Attacker's View – Seed Recovery Attack</h2>
+            <p class="panel-subtitle">Exploiting <code>java.util.Random</code> predictability</p>
+
+            <div id="attack-cards">
+                <!-- Card 1 – Vulnerability Explanation -->
+                <div class="attack-card" id="card-vuln">
+                    <div class="card-header">
+                        <span class="card-icon">⚠️</span>
+                        <h3>Vulnerability</h3>
+                    </div>
+                    <div class="card-body">
+                        <p><code>Login.generateSessionToken()</code> uses <code>new Random()</code> which is seeded from <code>System.nanoTime()</code>. Because <code>java.util.Random</code> is a 48-bit Linear Congruential Generator, observing a token lets an attacker brute-force the seed within a small time window.</p>
+                        <div class="code-block">
+<pre><span class="kw">private</span> String <span class="fn">generateSessionToken</span>() {
+    Random random = <span class="kw">new</span> Random(); <span class="cmt">// ← WEAK</span>
+    StringBuilder sb = <span class="kw">new</span> StringBuilder(<span class="num">16</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < <span class="num">16</span>; i++) {
+        sb.append(CHARSET.charAt(
+            random.nextInt(<span class="num">62</span>)));
+    }
+    <span class="kw">return</span> sb.toString();
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 – Attack Controls -->
+                <div class="attack-card" id="card-attack">
+                    <div class="card-header">
+                        <span class="card-icon">🎯</span>
+                        <h3>Attack Console</h3>
+                        <span class="card-status" id="attack-status">IDLE</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="attack-field">
+                            <label>Observed Token</label>
+                            <input type="text" id="observed-token" class="mono-input" readonly placeholder="Login to generate a token…">
+                        </div>
+                        <div class="attack-field">
+                            <label>Estimated Seed Epoch (ms)</label>
+                            <input type="text" id="estimated-seed" class="mono-input" readonly placeholder="—">
+                        </div>
+                        <div class="attack-field">
+                            <label>Search Window (±ms)</label>
+                            <input type="number" id="search-window" class="mono-input" value="2000" min="100" max="100000">
+                        </div>
+                        <button id="btn-attack" class="attack-btn" disabled>▶ Launch Seed Recovery</button>
+
+                        <!-- Progress -->
+                        <div id="attack-progress" class="hidden">
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+                            <div class="progress-text">
+                                <span id="progress-label">Scanning…</span>
+                                <span id="progress-pct">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 – Results -->
+                <div class="attack-card" id="card-results" >
+                    <div class="card-header">
+                        <span class="card-icon">📊</span>
+                        <h3>Results</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="results-placeholder" class="results-empty">Run the attack to see results here.</div>
+                        <div id="results-content" class="hidden">
+                            <table class="results-table">
+                                <tr><td>Recovered Seed</td><td id="res-seed" class="mono">—</td></tr>
+                                <tr><td>Predicted Token</td><td id="res-predicted" class="mono">—</td></tr>
+                                <tr><td>Match</td><td id="res-match">—</td></tr>
+                                <tr><td>Seeds Tried</td><td id="res-tried" class="mono">—</td></tr>
+                                <tr><td>Time Elapsed</td><td id="res-time" class="mono">—</td></tr>
+                            </table>
+                            <div id="res-banner" class="result-banner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 – Terminal Log -->
+                <div class="attack-card" id="card-log">
+                    <div class="card-header">
+                        <span class="card-icon">🖥️</span>
+                        <h3>Attack Log</h3>
+                        <button id="btn-clear-log" class="small-btn">Clear</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="log-output" class="terminal-log"><span class="log-info">[INFO] Waiting for session token…</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ─── Explanation Footer ─── -->
+    <footer id="footer-info">
+        <div class="footer-inner">
+            <h3>How This Exploit Works</h3>
+            <div class="explanation-steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div>
+                        <strong>Token Generation</strong>
+                        <p>When a user logs in, <code>Login.createSession()</code> generates a 16-char token using <code>java.util.Random</code> seeded by the current time.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div>
+                        <strong>Attacker Observes Token</strong>
+                        <p>An attacker intercepts the session token (e.g. via shared preferences, network sniffing, or log exposure).</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div>
+                        <strong>Seed Brute-Force</strong>
+                        <p>The attacker tries every plausible seed (timestamp ± window). Each candidate seed reproduces the same Random sequence. When the generated token matches, the seed is recovered.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div>
+                        <strong>Token Prediction</strong>
+                        <p>With the recovered seed, the attacker can predict current and future tokens, enabling session hijacking.</p>
+                    </div>
+                </div>
+            </div>
+            <p class="footer-note">Reference: <code>com.example.mastg_test0016.Login.generateSessionToken()</code> · OWASP MASTG · INFO5995 Assignment 1</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
