@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Credentials Emulator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Credentials Emulator</p>
+          <h1>Plaintext parsing, simulated.</h1>
+          <p class="lede">
+            This emulator mirrors the APK's plaintext credential storage format
+            and shows how a recovered file can be parsed.
+          </p>
+        </div>
+        <div class="badge">POC: credentials.txt</div>
+      </section>
+
+      <section class="panel">
+        <h2>Recovered File Snippet</h2>
+        <div class="file-row">
+          <label class="file-label">
+            Load credentials.txt
+            <input id="filePicker" type="file" accept=".txt" />
+          </label>
+          <p class="hint">Or paste lines below.</p>
+        </div>
+        <textarea id="fileInput" rows="6">Username: alice Password: P@ssw0rd
+Username: bob Password: 123456</textarea>
+        <div class="actions">
+          <button id="parseBtn">Parse Credentials</button>
+          <button id="clearBtn" class="ghost">Clear</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Emulated Console</h2>
+        <div id="console" class="console" aria-live="polite"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Recovered Accounts</h2>
+        <div id="results" class="results"></div>
+      </section>
+
+      <section class="panel">
+        <h2>What this mirrors</h2>
+        <p>
+          The APK writes plaintext lines like
+          <span class="mono">Username: &lt;user&gt; Password: &lt;pass&gt;</span> to
+          <span class="mono">credentials.txt</span>. Once obtained, the file can be
+          parsed to recover credentials.
+        </p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
