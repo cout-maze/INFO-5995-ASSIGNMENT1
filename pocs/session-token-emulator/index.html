@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Session Token Emulator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Session Token Emulator</p>
+          <h1>Predictable tokens, visualized.</h1>
+          <p class="lede">
+            This emulator mirrors the APK's session token generator and shows how a
+            narrow seed window can recover the same token.
+          </p>
+        </div>
+        <div class="badge">POC: java.util.Random</div>
+      </section>
+
+      <section class="panel">
+        <h2>Inputs</h2>
+        <div class="grid">
+          <label>
+            Observed login seed (ms)
+            <input id="seedInput" type="number" value="1735689600123" />
+          </label>
+          <label>
+            Search window (ms)
+            <input id="windowInput" type="number" value="2000" />
+          </label>
+          <label>
+            Token length
+            <input id="lengthInput" type="number" value="16" min="4" max="64" />
+          </label>
+          <label>
+            Character set
+            <input id="charsetInput" type="text" value="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" />
+          </label>
+        </div>
+        <div class="actions">
+          <button id="runBtn">Run Emulator</button>
+          <button id="resetBtn" class="ghost">Reset</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Emulated Console</h2>
+        <div id="console" class="console" aria-live="polite"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Attack Outcome</h2>
+        <div class="outcome">
+          <div>
+            <p class="label">Recovered seed</p>
+            <p id="recoveredSeed">—</p>
+          </div>
+          <div>
+            <p class="label">Predicted token</p>
+            <p id="predictedToken">—</p>
+          </div>
+          <div>
+            <p class="label">Status</p>
+            <p id="attackStatus">—</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>What this mirrors</h2>
+        <p>
+          The APK's session token generator uses <span class="mono">java.util.Random</span>,
+          which is predictable. With an observed token and a small time window, an
+          attacker can brute-force the seed and reproduce the same token.
+        </p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
