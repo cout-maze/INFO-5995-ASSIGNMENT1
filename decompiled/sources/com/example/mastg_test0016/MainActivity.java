@@ -8,8 +8,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Random;
 
 /* JADX INFO: loaded from: classes.dex */
@@ -52,35 +50,12 @@ public class MainActivity extends AppCompatActivity {
     /* JADX INFO: Access modifiers changed from: private */
     /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:15:0x0056 -> B:23:0x0059). Please report as a decompilation issue!!! */
     public void saveCredentialsToFile(String str, String str2) {
-        FileOutputStream fileOutputStreamOpenFileOutput = null;
         try {
-            try {
-                try {
-                    fileOutputStreamOpenFileOutput = openFileOutput("credentials.txt", 32768);
-                    fileOutputStreamOpenFileOutput.write(("Username: " + str + " Password: " + str2 + "\n").getBytes());
-                    Toast.makeText(this, "Credentials saved to file", 0).show();
-                    if (fileOutputStreamOpenFileOutput != null) {
-                        fileOutputStreamOpenFileOutput.close();
-                    }
-                } catch (Throwable th) {
-                    if (fileOutputStreamOpenFileOutput != null) {
-                        try {
-                            fileOutputStreamOpenFileOutput.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    throw th;
-                }
-            } catch (IOException e2) {
-                e2.printStackTrace();
-                Toast.makeText(this, "Error saving credentials", 0).show();
-                if (fileOutputStreamOpenFileOutput != null) {
-                    fileOutputStreamOpenFileOutput.close();
-                }
-            }
-        } catch (IOException e3) {
-            e3.printStackTrace();
+            SecurityUtils.storeCredential(this, str, str2);
+            Toast.makeText(this, "Credentials saved securely", 0).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error saving credentials", 0).show();
         }
     }
 }
